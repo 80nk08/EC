@@ -6,6 +6,7 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
 	<!--<PublishAot>true</PublishAot>-->
+	<!--<BuiltInComInteropSupport>true</BuiltInComInteropSupport>-->
 	<InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
@@ -15,24 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EC.Library\EC.Library.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="EncodingMappers\armenian.map">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\ASCII\1.docx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\ASCII\1.xlsx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\Unicode\1.docx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\Unicode\1.xlsx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
