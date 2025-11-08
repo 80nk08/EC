@@ -91,14 +91,12 @@ internal class Program
             foreach (var f in files)
             {
                 var file = new FileInfo(f).FullName;
-                if (file.EndsWith(".doc", StringComparison.OrdinalIgnoreCase) ||
-                    file.EndsWith(".docx", StringComparison.OrdinalIgnoreCase))
+                if (WordExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
                 {
                     Console.WriteLine($"Converting Word file: {file}");
                     wordConvertor.Convert(file, encodingType, fontName);
                 }
-                else if (file.EndsWith(".xls", StringComparison.OrdinalIgnoreCase) ||
-                         file.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+                else if (ExcelExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
                 {
                     Console.WriteLine($"Converting Excel file: {file}");
                     excelConvertor.Convert(file, encodingType, fontName);
