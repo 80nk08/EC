@@ -2,6 +2,7 @@
 using EC.Library.Core;
 using System.CommandLine;
 using System.CommandLine.Parsing;
+
 namespace EC.CLI;
 
 internal class Program
@@ -9,18 +10,18 @@ internal class Program
     static readonly string[] WordExtensions = [".doc", ".docx"];
     static readonly string[] ExcelExtensions = [".xls", ".xlsx"];
     static readonly string[] SupportedExtensions = [.. WordExtensions, .. ExcelExtensions];
+
     static int Main(string[] args)
     {
-        var fileOption = new Option<FileInfo?>("--file")
+        var fileOption = new Option<FileInfo?>("--file", "-f")
         {
             Description = "Path to the file to convert"
         };
-        var directoryOption = new Option<DirectoryInfo?>("--directory")
+        var directoryOption = new Option<DirectoryInfo?>("--directory", "-d")
         {
             Description = "Path to the directory to convert all supported files within"
         };
-
-        var typeOption = new Option<EncodingType>("--type")
+        var typeOption = new Option<EncodingType>("--type", "-t")
         {
             Description = "Encoding conversion type (ANSIToUnicode = 0 or UnicodeToANSI = 1)",
             Required = true
@@ -34,8 +35,8 @@ internal class Program
         };
         rootCommand.Validators.Add(commandResult =>
         {
-            var file = commandResult.GetResult(fileOption);
-            var directory = commandResult.GetResult(directoryOption);
+            var file = commandResult.GetValue(fileOption);
+            var directory = commandResult.GetValue(directoryOption);
             if (file is null && directory is null)
             {
                 commandResult.AddError("You must specify either --file or --directory.");
@@ -54,59 +55,82 @@ internal class Program
             return 1;
         }
 
-        var encodingMapper = EncodingMapper.FromFile("EncodingMappers\\armenian.map");
-        var textConvertor = new TextConvertor(encodingMapper);
-        using var wordConvertor = new WordConvertor(textConvertor, true);
-        using var excelConvertor = new ExcelConvertor(textConvertor, true);
-
-
-        var fileInfo = parseResult.GetValue(fileOption);
-        var directoryInfo = parseResult.GetValue(directoryOption);
-        var encodingType = parseResult.GetValue(typeOption);
-
-        var fontName = encodingType == EncodingType.ANSIToUnicode ? "Sylfaen" : "Arial";
-
-        if (fileInfo is not null)
+        try
         {
-            if (WordExtensions.Contains(Path.GetExtension(fileInfo.FullName), StringComparer.OrdinalIgnoreCase))
-            {
-                wordConvertor.Convert(fileInfo.FullName, encodingType, fontName);
-                return 0;
-            }
+            var encodingMapper = EncodingMapper.FromFile("EncodingMappers\\armenian.map");
+            var textConvertor = new TextConvertor(encodingMapper);
+            using var wordConvertor = new WordConvertor(textConvertor, true);
+            using var excelConvertor = new ExcelConvertor(textConvertor, true);
 
-            if (ExcelExtensions.Contains(Path.GetExtension(fileInfo.FullName), StringComparer.OrdinalIgnoreCase))
-            {
-                excelConvertor.Convert(fileInfo.FullName, encodingType, fontName);
-                return 0;
-            }
+            var file = parseResult.GetValue(fileOption);
+            var directory = parseResult.GetValue(directoryOption);
+            var type = parseResult.GetValue(typeOption);
 
+            var fontName = type == EncodingType.ANSIToUnicode ? "Sylfaen" : "Arial";
+
+            if (file != null)
+            {
+                ProcessFile(file, type, fontName, wordConvertor, excelConvertor);
+            }
+            else if (directory != null)
+            {
+                ProcessDirectory(directory, type, fontName, wordConvertor, excelConvertor);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+            return 1;
         }
 
-        if (directoryInfo is not null)
-        {
+        return 0;
+    }
 
-            var files = Directory.GetFiles(directoryInfo.FullName, "*.*", SearchOption.AllDirectories)
-                .Where(f => SupportedExtensions.Contains(Path.GetExtension(f), StringComparer.OrdinalIgnoreCase))
-                .ToArray();
-            foreach (var f in files)
+    private static void ProcessFile(FileInfo file, EncodingType encodingType, string fontName, WordConvertor wordConvertor, ExcelConvertor excelConvertor)
+    {
+        var extension = Path.GetExtension(file.FullName);
+        if (WordExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+        {
+            Console.WriteLine($"Converting Word file: {file.FullName}");
+            wordConvertor.Convert(file.FullName, encodingType, fontName);
+        }
+        else if (ExcelExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+        {
+            Console.WriteLine($"Converting Excel file: {file.FullName}");
+            excelConvertor.Convert(file.FullName, encodingType, fontName);
+        }
+        else
+        {
+            throw new NotSupportedException($"Unsupported file type: {extension}");
+        }
+    }
+
+    private static void ProcessDirectory(DirectoryInfo directory, EncodingType encodingType, string fontName, WordConvertor wordConvertor, ExcelConvertor excelConvertor)
+    {
+        var files = Directory.GetFiles(directory.FullName, "*.*", SearchOption.AllDirectories)
+            .Where(f => SupportedExtensions.Contains(Path.GetExtension(f), StringComparer.OrdinalIgnoreCase))
+            .ToArray();
+
+        foreach (var file in files)
+        {
+            try
             {
-                var file = new FileInfo(f).FullName;
-                if (WordExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
+                var extension = Path.GetExtension(file);
+                if (WordExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
                 {
                     Console.WriteLine($"Converting Word file: {file}");
                     wordConvertor.Convert(file, encodingType, fontName);
                 }
-                else if (ExcelExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
+                else if (ExcelExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
                 {
                     Console.WriteLine($"Converting Excel file: {file}");
                     excelConvertor.Convert(file, encodingType, fontName);
                 }
             }
-            return 0;
-
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing file {file}: {ex.Message}");
+            }
         }
-
-        return 1;
-
     }
 }
