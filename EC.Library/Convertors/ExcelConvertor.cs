@@ -5,8 +5,6 @@ namespace EC.Library.Convertors;
 
 public class ExcelConvertor: IDisposable
 {
-    public Action<double>? OnProgress { get; set; }
-
     private readonly dynamic _application;
     private readonly TextConvertor _textConvertor;
 
