@@ -1,4 +1,4 @@
-name: Build and Test .NET
+name: Build, Test, and Publish .NET
 
 on:
   push:
@@ -32,6 +32,18 @@ jobs:
         with:
           name: test-results
           path: ./TestResults/*.trx
+
+      - name: Publish EC.Library
+        run: dotnet publish EC.Library/EC.Library.csproj --configuration Release --output ./publish/EC.Library
+
+      - name: Publish EC.CLI
+        run: dotnet publish EC.CLI/EC.CLI.csproj --configuration Release --output ./publish/EC.CLI
+
+      - name: Upload Published Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-artifacts
+          path: ./publish/
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
