@@ -9,7 +9,7 @@ public class EncodingMapperTests
     public void Constructor_ValidArrays_MapsCorrectly()
     {
         var ansi = new[] { 'a', 'b' };
-        var unicode = new[] { '?', '?' };
+        var unicode = new[] { '?', '!' };
         var mapper = new EncodingMapper(ansi, unicode);
 
         Assert.Equal(2, mapper.Count);
@@ -19,6 +19,22 @@ public class EncodingMapperTests
     public void Constructor_InvalidArrays_ThrowsArgumentException()
     {
         var ansi = new[] { 'a' };
+        var unicode = new[] { '?', '?' };
+        Assert.Throws<ArgumentException>(() => new EncodingMapper(ansi, unicode));
+    }
+
+    [Fact]
+    public void Constructor_EmptyArrays_ThrowsArgumentException()
+    {
+        var ansi = Array.Empty<char>();
+        var unicode = Array.Empty<char>();
+        Assert.Throws<ArgumentException>(() => new EncodingMapper(ansi, unicode));
+    }
+
+    [Fact]
+    public void Constructor_DuplicateMappings_ThrowsArgumentException()
+    {
+        var ansi = new[] { 'a', 'a' };
         var unicode = new[] { '?', '?' };
         Assert.Throws<ArgumentException>(() => new EncodingMapper(ansi, unicode));
     }
@@ -53,7 +69,7 @@ public class EncodingMapperTests
         {
             "# comment",
             "a = ?",
-            "b=?",
+            "b = !",
             "  ",
             "malformedline"
         };
@@ -65,8 +81,8 @@ public class EncodingMapperTests
         Assert.Equal(2, mapper.Count);
         Assert.True(mapper.TryConvert('a', EncodingType.ANSIToUnicode, out var u1));
         Assert.Equal('?', u1);
-        Assert.True(mapper.TryConvert('?', EncodingType.UnicodeToANSI, out var a2));
-        Assert.Equal('b', a2);
+        Assert.True(mapper.TryConvert('b', EncodingType.ANSIToUnicode, out var u2));
+        Assert.Equal('!', u2);
 
         File.Delete(file);
     }

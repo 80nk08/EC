@@ -14,6 +14,12 @@ public class EncodingMapper
         if (ansi.Length != unicode.Length)
             throw new ArgumentException("ANSI and Unicode arrays must have the same length.");
 
+        if (ansi.Length == 0 || unicode.Length == 0)
+            throw new ArgumentException("ANSI and Unicode arrays must not be empty.");
+
+        if (ansi.Distinct().Count() != ansi.Length || unicode.Distinct().Count() != unicode.Length)
+            throw new ArgumentException("Duplicate mappings are not allowed in ANSI or Unicode arrays.");
+
         var ansiToUnicode = new Dictionary<char, char>();
         var unicodeToAnsi = new Dictionary<char, char>();
 
@@ -59,8 +65,11 @@ public class EncodingMapper
             if (left.Length == 0 || right.Length == 0)
                 continue;
 
-            ansi.Add(left[0]);
-            unicode.Add(right[0]);
+            if (!ansi.Contains(left[0]) && !unicode.Contains(right[0]))
+            {
+                ansi.Add(left[0]);
+                unicode.Add(right[0]);
+            }
         }
 
         return new EncodingMapper(ansi.ToArray(), unicode.ToArray());
