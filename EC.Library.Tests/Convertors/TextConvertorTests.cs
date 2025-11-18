@@ -1,18 +1,18 @@
-using EC.Library.Convertors;
+using EC.Library.Converters;
 using EC.Library.Core;
 using Xunit;
 
-namespace EC.Library.Tests.Convertors;
+namespace EC.Library.Tests.Converters;
 
-public class TextConvertorTests
+public class TextConverterTests
 {
     [Fact]
     public void Convert_ConvertsText_AccordingToEncodingType()
     {
         var mapper = new EncodingMapper(new[] { 'a', 'b' }, new[] { '?', '!' });
-        var convertor = new TextConvertor(mapper);
+        var converter = new TextConverter(mapper);
 
-        var result = convertor.Convert("ab", EncodingType.ANSIToUnicode);
+        var result = converter.Convert("ab", EncodingType.ANSIToUnicode);
 
         Assert.Equal("?!", result);
     }
@@ -21,9 +21,9 @@ public class TextConvertorTests
     public void Convert_UnknownChar_ReturnsOriginalChar()
     {
         var mapper = new EncodingMapper(new[] { 'a' }, new[] { '?' });
-        var convertor = new TextConvertor(mapper);
+        var converter = new TextConverter(mapper);
 
-        var result = convertor.Convert("az", EncodingType.ANSIToUnicode);
+        var result = converter.Convert("az", EncodingType.ANSIToUnicode);
 
         Assert.Equal("?z", result);
     }
@@ -32,9 +32,9 @@ public class TextConvertorTests
     public void Convert_EmptyString_ReturnsEmptyString()
     {
         var mapper = new EncodingMapper(new[] { 'a' }, new[] { '?' });
-        var convertor = new TextConvertor(mapper);
+        var converter = new TextConverter(mapper);
 
-        var result = convertor.Convert(string.Empty, EncodingType.ANSIToUnicode);
+        var result = converter.Convert(string.Empty, EncodingType.ANSIToUnicode);
 
         Assert.Equal(string.Empty, result);
     }
@@ -43,9 +43,9 @@ public class TextConvertorTests
     public void Convert_UnmappedCharacters_ReturnsOriginalString()
     {
         var mapper = new EncodingMapper(new[] { 'a' }, new[] { '?' });
-        var convertor = new TextConvertor(mapper);
+        var converter = new TextConverter(mapper);
 
-        var result = convertor.Convert("xyz", EncodingType.ANSIToUnicode);
+        var result = converter.Convert("xyz", EncodingType.ANSIToUnicode);
 
         Assert.Equal("xyz", result);
     }

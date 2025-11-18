@@ -1,16 +1,16 @@
 ﻿using EC.Library.Core;
 using System.Text;
 
-namespace EC.Library.Convertors;
+namespace EC.Library.Converters;
 
-public class ExcelConvertor: IDisposable
+public class ExcelConverter: IDisposable
 {
     private readonly dynamic _application;
-    private readonly TextConvertor _textConvertor;
+    private readonly TextConverter _textConverter;
 
-    public ExcelConvertor(TextConvertor textConvertor, bool visible)
+    public ExcelConverter(TextConverter textConverter, bool visible)
     {
-        _textConvertor = textConvertor;
+        _textConverter = textConverter;
 
         var applicationType = Type.GetTypeFromProgID("Excel.Application");
         ArgumentNullException.ThrowIfNull(applicationType);
@@ -26,6 +26,8 @@ public class ExcelConvertor: IDisposable
     {
         var document = _application.Workbooks.Open(filePath);
 
+        ArgumentNullException.ThrowIfNull(document);
+
         foreach (var sheet in document.Sheets)
         {
             double progressMaximum = sheet.UsedRange.Cells.Count;
@@ -37,7 +39,7 @@ public class ExcelConvertor: IDisposable
 
                 if (cell.Value == null)  continue;
 
-                cell.Value = _textConvertor.Convert(cell.Value.ToString(), encodingType);
+                cell.Value = _textConverter.Convert(cell.Value.ToString(), encodingType);
             }
         }
 

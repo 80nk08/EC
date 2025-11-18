@@ -1,4 +1,4 @@
-﻿using EC.Library.Convertors;
+﻿using EC.Library.Converters;
 using EC.Library.Core;
 using System.CommandLine;
 using System.CommandLine.Parsing;
@@ -58,9 +58,9 @@ internal class Program
         try
         {
             var encodingMapper = EncodingMapper.FromFile(@"..\..\..\..\Encodings\armenian.map");
-            var textConvertor = new TextConvertor(encodingMapper);
-            using var wordConvertor = new WordConvertor(textConvertor, true);
-            using var excelConvertor = new ExcelConvertor(textConvertor, true);
+            var textConverter = new TextConverter(encodingMapper);
+            using var wordConverter = new WordConverter(textConverter, true);
+            using var excelConverter = new ExcelConverter(textConverter, true);
 
             var file = parseResult.GetValue(fileOption);
             var directory = parseResult.GetValue(directoryOption);
@@ -70,11 +70,11 @@ internal class Program
 
             if (file != null)
             {
-                ProcessFile(file, type, fontName, wordConvertor, excelConvertor);
+                ProcessFile(file, type, fontName, wordConverter, excelConverter);
             }
             else if (directory != null)
             {
-                ProcessDirectory(directory, type, fontName, wordConvertor, excelConvertor);
+                ProcessDirectory(directory, type, fontName, wordConverter, excelConverter);
             }
         }
         catch (Exception ex)
@@ -86,18 +86,18 @@ internal class Program
         return 0;
     }
 
-    private static void ProcessFile(FileInfo file, EncodingType encodingType, string fontName, WordConvertor wordConvertor, ExcelConvertor excelConvertor)
+    private static void ProcessFile(FileInfo file, EncodingType encodingType, string fontName, WordConverter wordConverter, ExcelConverter excelConverter)
     {
         var extension = Path.GetExtension(file.FullName);
         if (WordExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
         {
             Console.WriteLine($"Converting Word file: {file.FullName}");
-            wordConvertor.Convert(file.FullName, encodingType, fontName);
+            wordConverter.Convert(file.FullName, encodingType, fontName);
         }
         else if (ExcelExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
         {
             Console.WriteLine($"Converting Excel file: {file.FullName}");
-            excelConvertor.Convert(file.FullName, encodingType, fontName);
+            excelConverter.Convert(file.FullName, encodingType, fontName);
         }
         else
         {
@@ -105,7 +105,7 @@ internal class Program
         }
     }
 
-    private static void ProcessDirectory(DirectoryInfo directory, EncodingType encodingType, string fontName, WordConvertor wordConvertor, ExcelConvertor excelConvertor)
+    private static void ProcessDirectory(DirectoryInfo directory, EncodingType encodingType, string fontName, WordConverter wordConverter, ExcelConverter excelConverter)
     {
         var files = Directory.GetFiles(directory.FullName, "*.*", SearchOption.AllDirectories)
             .Where(f => SupportedExtensions.Contains(Path.GetExtension(f), StringComparer.OrdinalIgnoreCase))
@@ -119,12 +119,12 @@ internal class Program
                 if (WordExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
                 {
                     Console.WriteLine($"Converting Word file: {file}");
-                    wordConvertor.Convert(file, encodingType, fontName);
+                    wordConverter.Convert(file, encodingType, fontName);
                 }
                 else if (ExcelExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
                 {
                     Console.WriteLine($"Converting Excel file: {file}");
-                    excelConvertor.Convert(file, encodingType, fontName);
+                    excelConverter.Convert(file, encodingType, fontName);
                 }
             }
             catch (Exception ex)

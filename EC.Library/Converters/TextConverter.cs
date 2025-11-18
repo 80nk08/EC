@@ -1,9 +1,9 @@
 ﻿using EC.Library.Core;
 using System.Text;
 
-namespace EC.Library.Convertors;
+namespace EC.Library.Converters;
 
-public class TextConvertor(EncodingMapper encodingMap)
+public class TextConverter(EncodingMapper encodingMap)
 {
 
     public string Convert(string text, EncodingType encodingType)

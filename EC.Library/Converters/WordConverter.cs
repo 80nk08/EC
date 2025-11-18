@@ -1,16 +1,16 @@
 ﻿using EC.Library.Core;
 using System.Text;
 
-namespace EC.Library.Convertors;
+namespace EC.Library.Converters;
 
-public class WordConvertor :  IDisposable
+public class WordConverter :  IDisposable
 {
     private readonly dynamic _application;
-    private readonly TextConvertor _textConvertor;
+    private readonly TextConverter _textConverter;
 
-    public WordConvertor(TextConvertor textConvertor, bool visible)
+    public WordConverter(TextConverter textConverter, bool visible)
     {
-        _textConvertor = textConvertor;
+        _textConverter = textConverter;
 
         var applicationType = Type.GetTypeFromProgID("Word.Application");
         ArgumentNullException.ThrowIfNull(applicationType);
@@ -27,13 +27,13 @@ public class WordConvertor :  IDisposable
         var document = _application.Documents.Open(filePath);
 
         document.Content.Font.Name = fontName;
-        document.Content.Text = _textConvertor.Convert(document.Content.Text.ToString(), encodingType);
+        document.Content.Text = _textConverter.Convert(document.Content.Text.ToString(), encodingType);
 
         foreach (var footnote in document.Footnotes)
         {
             footnote.Range.Font.Name = fontName;
 
-            footnote.Range.Text = _textConvertor.Convert(footnote.Range.Text.ToString(), encodingType);
+            footnote.Range.Text = _textConverter.Convert(footnote.Range.Text.ToString(), encodingType);
         }
         foreach (var sections in document.Sections)
         {
@@ -41,40 +41,40 @@ public class WordConvertor :  IDisposable
             {
                 headers.Range.Font.Name = fontName;
 
-                headers.Range.Text = _textConvertor.Convert(headers.Range.Text.ToString(), encodingType);
+                headers.Range.Text = _textConverter.Convert(headers.Range.Text.ToString(), encodingType);
             }
 
             foreach (var footer in sections.Footers)
             {
                 footer.Range.Font.Name = fontName;
 
-                footer.Range.Text = _textConvertor.Convert(footer.Range.Text.ToString(), encodingType);
+                footer.Range.Text = _textConverter.Convert(footer.Range.Text.ToString(), encodingType);
             }
         }
         foreach (var endnote in document.Endnotes)
         {
             endnote.Range.Font.Name = fontName;
-            endnote.Range.Text = _textConvertor.Convert(endnote.Range.Text.ToString(), encodingType);
+            endnote.Range.Text = _textConverter.Convert(endnote.Range.Text.ToString(), encodingType);
         }
         foreach (var shape in document.Shapes)
         {
             if (shape.TextFrame.HasText != 0)
             {
                 shape.TextFrame.TextRange.Font.Name = fontName;
-                shape.TextFrame.TextRange.Text = _textConvertor.Convert(shape.TextFrame.TextRange.Text.ToString(), encodingType);
+                shape.TextFrame.TextRange.Text = _textConverter.Convert(shape.TextFrame.TextRange.Text.ToString(), encodingType);
             }
         }
         foreach (var comment in document.Comments)
         {
             comment.Range.Font.Name = fontName;
-            comment.Range.Text = _textConvertor.Convert(comment.Range.Text.ToString(), encodingType);
+            comment.Range.Text = _textConverter.Convert(comment.Range.Text.ToString(), encodingType);
         }
         foreach (var table in document.Tables)
         {
             foreach (var cell in table.Range.Cells)
             {
                 cell.Range.Font.Name = fontName;
-                cell.Range.Text = _textConvertor.Convert(cell.Range.Text.ToString(), encodingType);
+                cell.Range.Text = _textConverter.Convert(cell.Range.Text.ToString(), encodingType);
             }
         }
 
