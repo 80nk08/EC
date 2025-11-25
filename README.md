@@ -16,6 +16,7 @@ The **Armenian Encoding Converter (EC)** is a .NET 9 application for converting 
 - [Contributing](#contributing)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
+- [References](#references)
 
 ## Features
 
@@ -114,3 +115,7 @@ MIT License. See [LICENSE](LICENSE).
 ## Acknowledgments
 
 Special thanks to contributors and the open-source community.
+
+## References
+
+- [.NET 9 Documentation](https://docs.microsoft.com/en-us/dotnet/core/introduction)
