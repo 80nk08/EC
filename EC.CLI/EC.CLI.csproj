@@ -18,4 +18,10 @@
     <ProjectReference Include="..\EC.Library\EC.Library.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="armenian.map">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
