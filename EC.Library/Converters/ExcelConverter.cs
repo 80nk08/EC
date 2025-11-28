@@ -26,25 +26,41 @@ public class ExcelConverter: IDisposable
     {
         var document = _application.Workbooks.Open(filePath);
 
-        ArgumentNullException.ThrowIfNull(document);
-
-        foreach (var sheet in document.Sheets)
+        try
         {
-            double progressMaximum = sheet.UsedRange.Cells.Count;
+            ArgumentNullException.ThrowIfNull(document);
 
-            sheet.UsedRange.Font.Name = fontName;
-
-            foreach (var cell in sheet.UsedRange.Cells)
+            foreach (var sheet in document.Sheets)
             {
+                double progressMaximum = sheet.UsedRange.Cells.Count;
 
-                if (cell.Value == null)  continue;
+                sheet.UsedRange.Font.Name = fontName;
 
-                cell.Value = _textConverter.Convert(cell.Value.ToString(), encodingType);
+                foreach (var cell in sheet.UsedRange.Cells)
+                {
+
+                    if (cell.Value == null) continue;
+
+                    cell.Value = _textConverter.Convert(cell.Value.ToString(), encodingType);
+                }
             }
+
+            document.Save();
+        }
+        finally
+        {
+            document.Close();
+            ReleaseComObject(document);
         }
 
-        document.Save();
-        document.Close();
+    }
+    
+    private static void ReleaseComObject(object? obj)
+    {
+        if (obj != null)
+        {
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
+        }
     }
 
     public void Dispose()
